@@ -1,0 +1,31 @@
+{
+  "name": "node-quickbooks-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.39.1",
+    "hono": "^4.6.19",
+    "luxon": "^3.5.0",
+    "postgres": "^3.4.5",
+    "soap": "^1.1.8",
+    "uuid": "^11.0.5",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.4.2",
+    "@types/node": "^22.13.1",
+    "@types/uuid": "^10.0.0",
+    "@types/xml2js": "^0.4.14",
+    "drizzle-kit": "^0.30.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
