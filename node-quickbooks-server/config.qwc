@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<QBWCXML>
+  <AppName>QBWC Expenses PHP</AppName>
+  <AppID></AppID>
+  <AppURL>https://xps-itanalyst.tail57c5f7.ts.net/soap</AppURL>
+  <AppDescription>QuickBooks Web Connector PHP Implementation</AppDescription>
+  <AppSupport>https://xps-itanalyst.tail57c5f7.ts.net/soap</AppSupport>
+  <UserName>qb_admin</UserName>
+  <OwnerID>{60453947-d7d3-4e23-9c59-bca7f7c6774a}</OwnerID>
+  <FileID>{6796edbb-7a11-4b73-9f58-248c6929b57e}</FileID>
+  <QBType>QBFS</QBType>
+  <Scheduler>
+    <RunEveryNMinutes>60</RunEveryNMinutes>
+  </Scheduler>
+</QBWCXML>

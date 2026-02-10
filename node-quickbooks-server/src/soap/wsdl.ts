@@ -302,7 +302,7 @@ export const WSDL = `<?xml version="1.0" encoding="utf-8"?>
   </wsdl:binding>
   <wsdl:service name="QBWebConnectorSvc">
     <wsdl:port name="QBWebConnectorSvcSoap" binding="tns:QBWebConnectorSvcSoap">
-      <soap:address location="http://localhost:3000/soap" />
+      <soap:address location="https://xps-itanalyst.tail57c5f7.ts.net/soap" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>`;

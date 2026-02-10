@@ -34,11 +34,12 @@ export const service = {
           .limit(1);
 
         if (user.length === 0 || user[0].status !== 'e') {
-          await logger.log(`authenticate() - Login failed for ${strUserName}`);
+          await logger.log(`authenticate() - Login failed for ${strUserName}. User found: ${user.length}, Status: ${user.length > 0 ? user[0].status : 'N/A'}`);
+          console.log(`Auth failed. Input: ${strUserName}/${strPassword}. DB result:`, user);
           return {
-              authenticateResult: {
-                  string: ['', 'nvu'] // Ticket, status
-              }
+            authenticateResult: {
+              string: ['', 'nvu'] // Ticket, status
+            }
           };
         }
 
@@ -87,7 +88,7 @@ export const service = {
         // Validate Ticket
         const ticketRecord = await db.select().from(quickbooksTicket).where(eq(quickbooksTicket.ticket, ticket)).limit(1);
         if (ticketRecord.length === 0) {
-            return { sendRequestXMLResult: '' };
+          return { sendRequestXMLResult: '' };
         }
         const user = ticketRecord[0].qb_username;
 
@@ -95,7 +96,7 @@ export const service = {
         const item = await queue.dequeue(user);
 
         if (!item) {
-            return { sendRequestXMLResult: '' };
+          return { sendRequestXMLResult: '' };
         }
 
         // Mark as processing
@@ -118,10 +119,10 @@ export const service = {
         // We can inject it if missing, using the queue ID.
 
         if (xml && !xml.includes('requestID="')) {
-             // Rough injection, should be smarter
-             // Assuming <ActionRq ...> format
-             xml = xml.replace(/Rq /g, `Rq requestID="${item.quickbooks_queue_id}" `);
-             xml = xml.replace(/Rq>/g, `Rq requestID="${item.quickbooks_queue_id}">`);
+          // Rough injection, should be smarter
+          // Assuming <ActionRq ...> format
+          xml = xml.replace(/Rq /g, `Rq requestID="${item.quickbooks_queue_id}" `);
+          xml = xml.replace(/Rq>/g, `Rq requestID="${item.quickbooks_queue_id}">`);
         }
 
         return { sendRequestXMLResult: xml };
@@ -134,7 +135,7 @@ export const service = {
         // Validate Ticket
         const ticketRecord = await db.select().from(quickbooksTicket).where(eq(quickbooksTicket.ticket, ticket)).limit(1);
         if (ticketRecord.length === 0) {
-             return { receiveResponseXMLResult: -1 };
+          return { receiveResponseXMLResult: -1 };
         }
         const user = ticketRecord[0].qb_username;
 
@@ -143,36 +144,36 @@ export const service = {
         let queueId: number | null = null;
         const match = response.match(/requestID="(\d+)"/);
         if (match && match[1]) {
-            queueId = parseInt(match[1]);
+          queueId = parseInt(match[1]);
         }
 
         // If we can't find requestID in XML, try to find the item currently in 'processing' state
         if (!queueId) {
-             const processingItem = await queue.processing(user);
-             if (processingItem) {
-                 queueId = processingItem.quickbooks_queue_id;
-             }
+          const processingItem = await queue.processing(user);
+          if (processingItem) {
+            queueId = processingItem.quickbooks_queue_id;
+          }
         }
 
         if (queueId) {
-             // Determine status
-             // If hresult is non-zero, it's usually an error, but QBWC sometimes sends errors as responses too.
-             // We should check the 'statusSeverity' in the XML response.
+          // Determine status
+          // If hresult is non-zero, it's usually an error, but QBWC sometimes sends errors as responses too.
+          // We should check the 'statusSeverity' in the XML response.
 
-             let status = QUICKBOOKS_STATUS_SUCCESS;
-             let logMsg = 'Success';
+          let status = QUICKBOOKS_STATUS_SUCCESS;
+          let logMsg = 'Success';
 
-             if (message || (hresult && hresult !== '')) {
-                 status = QUICKBOOKS_STATUS_ERROR;
-                 logMsg = `${hresult}: ${message}`;
-             } else if (response.includes('statusSeverity="Error"')) {
-                 status = QUICKBOOKS_STATUS_ERROR;
-                 // Extract statusMessage
-                 const msgMatch = response.match(/statusMessage="([^"]+)"/);
-                 logMsg = msgMatch ? msgMatch[1] : 'Unknown Error';
-             }
+          if (message || (hresult && hresult !== '')) {
+            status = QUICKBOOKS_STATUS_ERROR;
+            logMsg = `${hresult}: ${message}`;
+          } else if (response.includes('statusSeverity="Error"')) {
+            status = QUICKBOOKS_STATUS_ERROR;
+            // Extract statusMessage
+            const msgMatch = response.match(/statusMessage="([^"]+)"/);
+            logMsg = msgMatch ? msgMatch[1] : 'Unknown Error';
+          }
 
-             await queue.updateStatus(ticket, queueId, status, logMsg);
+          await queue.updateStatus(ticket, queueId, status, logMsg);
         }
 
         // Calculate progress
@@ -182,7 +183,7 @@ export const service = {
 
         let percentage = 100;
         if (total > 0) {
-            percentage = Math.floor((processed * 100) / total);
+          percentage = Math.floor((processed * 100) / total);
         }
         if (left > 0 && percentage === 100) percentage = 99;
 
@@ -203,7 +204,7 @@ export const service = {
 
         const ticketRecord = await db.select().from(quickbooksTicket).where(eq(quickbooksTicket.ticket, ticket)).limit(1);
         if (ticketRecord.length > 0 && ticketRecord[0].lasterror_msg) {
-             return { getLastErrorResult: ticketRecord[0].lasterror_msg };
+          return { getLastErrorResult: ticketRecord[0].lasterror_msg };
         }
 
         return { getLastErrorResult: '' };
